@@ -19,28 +19,29 @@ include("dataConnect.php");
 
 /*************************** count function Example**************/
 
-$columns = array("customer_id", "customer_first_name", "customer_last_name", "customer_email", "customer_street", "customer_city", "customer_state", "customer_zip", "customer_university");
-$results = array();
-
-// In this example we are looking for California
+// In this example, we are looking for California
 $state = "California";
 
-$agent_amount_string = "SELECT COUNT(*) FROM biz_customer WHERE customer_state = '$state'";
-$a_amount = @mysqli_query($dbc, $agent_amount_string);
-$arow = mysqli_fetch_row($a_amount);
-echo "Total customers from this state: " . $arow[0] . " <br/>";
-$agent_amount = $arow[0];
-echo "Amount $agent_amount </br>";
+// Count the number of customers from California
+$state_count_query = "SELECT COUNT(*) FROM biz_customer WHERE customer_state = '$state'";
+$state_count_result = @mysqli_query($dbc, $state_count_query);
+$state_count = mysqli_fetch_row($state_count_result)[0];
 
-$query_info_string = ("SELECT * FROM biz_customer WHERE customer_state ='$state'");
-$q_results = @mysqli_query($dbc, $query_info_string);
+echo "Total customers from the state of California: $state_count <br/>";
 
-while ($record = @mysqli_fetch_array($q_results, MYSQLI_ASSOC)) {
+mysqli_free_result($state_count_result);
+
+// Fetch customer information from the database
+$customer_query = "SELECT * FROM biz_customer WHERE customer_state ='$state'";
+$customer_results = @mysqli_query($dbc, $customer_query);
+
+// Store customer information in an array
+$results = [];
+while ($record = @mysqli_fetch_assoc($customer_results)) {
     $results[] = $record;
 }
 
-mysqli_free_result($a_amount);
-
+// Print customer information
 function print_customer($record) {
     echo " Customer ID: " . $record["customer_id"] . "</br>";
     echo " First Name: " . $record["customer_first_name"] . "</br>";
@@ -57,6 +58,7 @@ foreach ($results as $record) {
     print_customer($record);
 }
 
-$stuff = count($results);
-echo "The array contained information for $stuff customer(s).";
+// Display summary
+$customer_count = count($results);
+echo "The array contains information for $customer_count customer(s).";
 ?>
